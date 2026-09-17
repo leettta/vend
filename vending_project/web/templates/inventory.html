@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}재고 관리 - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('products') }}" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i>제품 목록으로</a>
+</div>
+
+<h4 class="fw-bold mb-4">📦 [{{ product.name }}] 재고(지급 데이터) 관리</h4>
+
+<div class="row g-4">
+    <!-- 대량 등록 -->
+    <div class="col-lg-5">
+        <div class="card bg-secondary-dark border-secondary">
+            <div class="card-header bg-transparent border-secondary fw-bold">
+                지급 데이터(코드/계정) 대량 추가
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">한 줄에 하나씩 입력하세요.</label>
+                        <textarea name="items_text" class="form-control bg-dark text-light border-secondary font-monospace" rows="12" placeholder="KEY-AAA-BBB-CCC&#10;KEY-DDD-EEE-FFF&#10;user:pass123" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">재고 등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 미사용 재고 목록 -->
+    <div class="col-lg-7">
+        <div class="card bg-secondary-dark border-secondary">
+            <div class="card-header bg-transparent border-secondary fw-bold d-flex justify-content-between">
+                <span>남은 미사용 재고 ({{ unused_items|length }}개)</span>
+            </div>
+            <div class="card-body p-0" style="max-height: 450px; overflow-y: auto;">
+                <table class="table table-dark table-hover mb-0 small font-monospace">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>지급 데이터</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in unused_items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.delivery_data }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('inventory_delete', inv_id=item.id) }}" class="d-inline" onsubmit="return confirm('이 재고 항목을 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0">삭제</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center py-4 text-muted">등록된 미사용 재고가 없습니다.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

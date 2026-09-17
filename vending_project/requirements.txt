@@ -1,0 +1,7 @@
+discord.py>=2.3.2
+Flask>=3.0.0
+SQLAlchemy>=2.0.25
+python-dotenv>=1.0.0
+Werkzeug>=3.0.1
+Pillow>=10.2.0
+requests>=2.31.0

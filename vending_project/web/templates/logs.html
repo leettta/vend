@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}로그 채널 설정{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold mb-4"><i class="fa-solid fa-bullhorn me-2 text-primary"></i>Discord 로그 채널 설정</h4>
+
+<div class="card bg-secondary-dark border-secondary">
+    <div class="card-body">
+        <form method="POST">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>로그 항목</th>
+                            <th>전송할 Discord 채널 ID (숫자)</th>
+                            <th>테스트</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lt, title in log_types %}
+                        <tr>
+                            <td class="fw-bold">{{ title }}</td>
+                            <td>
+                                <input type="text" name="ch_{{ lt }}" class="form-control bg-dark text-light border-secondary" value="{{ settings_map.get(lt) or '' }}" placeholder="채널 ID를 입력하세요">
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-info btn-test-log" data-log-type="{{ lt }}">테스트 전송</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-primary px-4 fw-bold mt-3">설정 저장</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

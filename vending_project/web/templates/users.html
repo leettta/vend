@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}회원 관리{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold mb-4"><i class="fa-solid fa-users me-2 text-primary"></i>회원 관리</h4>
+
+<div class="card bg-secondary-dark border-secondary">
+    <div class="card-body p-0">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Discord ID</th>
+                    <th>닉네임</th>
+                    <th>보유 잔액</th>
+                    <th>총 충전액</th>
+                    <th>총 사용액</th>
+                    <th>상태</th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.discord_id }}</td>
+                    <td class="fw-bold">{{ u.username }}</td>
+                    <td class="text-primary fw-bold">{{ "{:,}".format(u.balance) }}원</td>
+                    <td>{{ "{:,}".format(u.total_charged) }}원</td>
+                    <td>{{ "{:,}".format(u.total_spent) }}원</td>
+                    <td>
+                        {% if u.is_banned %}
+                        <span class="badge bg-danger">이용제한</span>
+                        {% else %}
+                        <span class="badge bg-success">정상</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#balanceModal{{ u.id }}">잔액 조정</button>
+                        {% if u.is_banned %}
+                        <form method="POST" action="{{ url_for('user_adjust', u_id=u.id) }}" class="d-inline">
+                            <input type="hidden" name="action" value="unban">
+                            <button type="submit" class="btn btn-sm btn-outline-success">제한 해제</button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('user_adjust', u_id=u.id) }}" class="d-inline" onsubmit="return confirm('이 사용자의 자판기 이용을 제한하시겠습니까?');">
+                            <input type="hidden" name="action" value="ban">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">이용 제한</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                <!-- 잔액 조정 모달 -->
+                <div class="modal fade" id="balanceModal{{ u.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-secondary-dark text-light border-secondary">
+                            <form method="POST" action="{{ url_for('user_adjust', u_id=u.id) }}">
+                                <input type="hidden" name="action" value="adjust">
+                                <div class="modal-header border-secondary">
+                                    <h5 class="modal-title">{{ u.username }} 잔액 수동 조정</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="small text-muted">현재 잔액: {{ "{:,}".format(u.balance) }}원</p>
+                                    <div class="mb-3">
+                                        <label class="form-label">추가/차감 금액 (음수는 차감)</label>
+                                        <input type="number" name="amount" class="form-control bg-dark text-light border-secondary" placeholder="예: 5000 또는 -5000" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-secondary">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                    <button type="submit" class="btn btn-primary">적용</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <tr><td colspan="7" class="text-center py-4 text-muted">등록된 회원이 없습니다.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
